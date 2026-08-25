@@ -224,8 +224,9 @@ Streamable HTTP endpoints:
 
 Each endpoint is a separate MCP server. They do not keep sessions or rely on
 in-memory state, so they can run on any Cloudflare Pages Function instance.
-POST requests use JSON responses over the MCP Streamable HTTP transport and the
-endpoint supports the standard `POST`, `GET`, and `DELETE` methods.
+POST requests use JSON responses over the MCP Streamable HTTP transport. Because
+these endpoints are stateless, `GET` and `DELETE` return `405`; clients should
+use `POST` for initialization and tool calls.
 
 The endpoints are public by default. Set the optional `MCP_ACCESS_TOKEN`
 Pages secret to require `Authorization: Bearer <token>`:

@@ -22,11 +22,51 @@ function getCorsHeaders(): Record<string, string> {
   return {
     "Access-Control-Allow-Headers":
       "Accept, Authorization, Content-Type, Mcp-Protocol-Version, Mcp-Session-Id",
-    "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Expose-Headers": "Mcp-Session-Id",
     "Access-Control-Max-Age": "86400",
   }
+}
+
+async function limitRequestBody(request: Request): Promise<Request | null> {
+  const contentLength = request.headers.get("Content-Length")
+  if (
+    contentLength &&
+    Number.isFinite(Number(contentLength)) &&
+    Number(contentLength) > MAX_REQUEST_BYTES
+  ) {
+    return null
+  }
+
+  if (!request.body) return request
+
+  const reader = request.body.getReader()
+  const chunks: Uint8Array[] = []
+  let totalBytes = 0
+
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) break
+    if (!value) continue
+
+    totalBytes += value.byteLength
+    if (totalBytes > MAX_REQUEST_BYTES) {
+      await reader.cancel()
+      return null
+    }
+
+    chunks.push(value)
+  }
+
+  const body = new Uint8Array(totalBytes)
+  let offset = 0
+  for (const chunk of chunks) {
+    body.set(chunk, offset)
+    offset += chunk.byteLength
+  }
+
+  return new Request(request, { body })
 }
 
 function withCors(response: Response): Response {
@@ -83,24 +123,26 @@ export function createMcpEndpoint(
       })
     }
 
-    const contentLength = request.headers.get("Content-Length")
-    if (
-      contentLength &&
-      Number.isFinite(Number(contentLength)) &&
-      Number(contentLength) > MAX_REQUEST_BYTES
-    ) {
-      return errorResponse(413, "Request body is too large")
+    if (request.method !== "POST") {
+      return errorResponse(405, "Only POST requests are supported", {
+        Allow: "POST, OPTIONS",
+      })
     }
 
-    const server = createServer()
-    const transport = new WebStandardStreamableHTTPServerTransport({
-      enableJsonResponse: true,
-      sessionIdGenerator: undefined,
-    })
-
     try {
+      const boundedRequest = await limitRequestBody(request)
+      if (!boundedRequest) {
+        return errorResponse(413, "Request body is too large")
+      }
+
+      const server = createServer()
+      const transport = new WebStandardStreamableHTTPServerTransport({
+        enableJsonResponse: true,
+        sessionIdGenerator: undefined,
+      })
+
       await server.connect(transport)
-      const response = await transport.handleRequest(request)
+      const response = await transport.handleRequest(boundedRequest)
       return withCors(response)
     } catch (error) {
       console.error("MCP request failed", error)

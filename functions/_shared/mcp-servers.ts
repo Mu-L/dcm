@@ -219,6 +219,29 @@ export function createComposeServer(): McpServer {
       }),
     },
     async ({ settings, showInterpolated, toolIds }) => {
+      const seenToolIds = new Set<string>()
+      const duplicateToolIds: string[] = []
+      for (const id of toolIds) {
+        if (seenToolIds.has(id)) {
+          duplicateToolIds.push(id)
+          continue
+        }
+
+        seenToolIds.add(id)
+      }
+
+      if (duplicateToolIds.length > 0) {
+        return {
+          content: [
+            {
+              text: `Duplicate Docker tool IDs: ${duplicateToolIds.join(", ")}`,
+              type: "text",
+            },
+          ],
+          isError: true,
+        }
+      }
+
       const selectedTools = toolIds.map((id) =>
         tools.find((tool) => tool.id === id),
       )
