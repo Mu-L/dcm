@@ -12,13 +12,15 @@
     "lint": "biome lint",
     "format": "biome format",
     "ci": "bun test && bun lint && bun format && bun run build",
-    "deploy": "next build && wrangler pages deploy",
+    "deploy": "next build && wrangler pages functions build --outdir=out/_worker.js && wrangler pages deploy out",
     "test:compose": "bun test tests/validate-compose.test.ts",
     "test:containers": "bun test tests/validate-all-containers.test.ts",
     "test:templates": "bun test tests/templates.test.ts",
     "test": "bun test"
   },
   "dependencies": {
+    "@cfworker/json-schema": "^4.1.1",
+    "@modelcontextprotocol/server": "2.0.0-alpha.2",
     "@hookform/resolvers": "^5.2.2",
     "@monaco-editor/react": "^4.7.0",
     "@radix-ui/react-accordion": "^1.2.12",
@@ -76,7 +78,7 @@
     "tailwind-merge": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^1.1.2",
-    "zod": "^3.25.76"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",

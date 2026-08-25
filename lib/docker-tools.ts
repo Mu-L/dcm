@@ -94,7 +94,7 @@ export function validateComposeContent(content: string): {
   } catch (error) {
     if (error instanceof z.ZodError) {
       result.isValid = false
-      result.errors = error.errors.map((err) => err.message)
+      result.errors = error.issues.map((issue) => issue.message)
       return result
     }
   }
