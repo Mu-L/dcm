@@ -976,4 +976,23 @@ export const other: DockerTool[] = [
       - \${DATA_PATH}/octoeverywhere:/data
     restart: \${RESTART_POLICY}`,
   },
+  {
+    id: "omni-tools",
+    name: "OmniTools",
+    description:
+      "Self-hosted collection of powerful web-based tools for everyday tasks. No ads, no tracking, just fast, accessible utilities right from your browser!",
+    category: "Other",
+    tags: ["Tools", "Editor", "File Converter"],
+    githubUrl: "https://github.com/iib0011/omni-tools",
+    icon: "https://github.com/iib0011/omni-tools/blob/main/public/favicon.svg",
+    composeContent: `services:
+  omnitools:
+    container_name: \${CONTAINER_PREFIX}omni-tools
+    image: ghcr.io/iib0011/omni-tools:latest
+    ports:
+      - "5005:80"
+    restart: \${RESTART_POLICY}
+    security_opt:
+      - "no-new-privileges:true"`,
+  },
 ]
