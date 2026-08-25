@@ -1,4 +1,5 @@
 import { ContainerSubmissionForm } from "@/components/container-submission-form"
+import { McpSetupDialog } from "@/components/mcp-setup-dialog"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { GradientButton } from "@/components/ui/gradient-button"
 import { Heart } from "lucide-react"
@@ -8,7 +9,7 @@ export function Header() {
   return (
     <header className="relative z-10 bg-primary/80 bg-stripes py-8 text-primary-foreground shadow-md dark:bg-stripes-dark">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h1 className="mb-2 font-bold text-xl motion-safe:animate-slide-in-left md:text-2xl lg:text-3xl">
               Docker Compose Generator
@@ -17,8 +18,9 @@ export function Header() {
               Select the tools you want to include in your docker-compose.yaml
             </p>
           </div>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex w-full flex-wrap items-center gap-3 lg:w-auto lg:justify-end">
             <ThemeToggle />
+            <McpSetupDialog />
             <ContainerSubmissionForm />
 
             <GradientButton
@@ -31,10 +33,7 @@ export function Header() {
               <span>Support me</span>
             </GradientButton>
 
-            <GradientButton
-              href="https://github.com/ajnart/dcm"
-              external
-            >
+            <GradientButton href="https://github.com/ajnart/dcm" external>
               <svg
                 aria-label="GitHub"
                 role="img"
