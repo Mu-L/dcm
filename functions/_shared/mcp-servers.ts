@@ -33,6 +33,7 @@ const defaultComposeSettings = {
   umask: "022",
 }
 
+/** Create a named MCP server with the shared DCM v2 version. */
 function createServer(name: string): McpServer {
   return new McpServer({
     name,
@@ -40,6 +41,7 @@ function createServer(name: string): McpServer {
   })
 }
 
+/** Return the public catalog fields for one Docker tool. */
 function summarizeTool(tool: DockerTool) {
   return {
     category: tool.category,
@@ -53,6 +55,7 @@ function summarizeTool(tool: DockerTool) {
   }
 }
 
+/** Create the stateless MCP server that exposes Docker tool discovery. */
 export function createToolsServer(): McpServer {
   const server = createServer("dcm-tools")
 
@@ -126,6 +129,7 @@ export function createToolsServer(): McpServer {
   return server
 }
 
+/** Create the stateless MCP server that exposes template discovery. */
 export function createTemplatesServer(): McpServer {
   const server = createServer("dcm-templates")
 
@@ -204,6 +208,7 @@ export function createTemplatesServer(): McpServer {
   return server
 }
 
+/** Create the stateless MCP server that generates Compose and env content. */
 export function createComposeServer(): McpServer {
   const server = createServer("dcm-compose")
 

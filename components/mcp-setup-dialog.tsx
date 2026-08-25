@@ -52,6 +52,7 @@ const MCP_ENDPOINTS = [
 
 type CopyState = "idle" | "success" | "error"
 
+/** Generate the MCP client configuration for the active deployment origin. */
 function createMcpConfig(origin: string) {
   const mcpServers = Object.fromEntries(
     MCP_ENDPOINTS.map((endpoint) => [
@@ -63,6 +64,7 @@ function createMcpConfig(origin: string) {
   return JSON.stringify({ mcpServers }, null, 2)
 }
 
+/** Render clipboard feedback for the generated MCP client configuration. */
 function CopyButton({ value }: { value: string }) {
   const [copyState, setCopyState] = useState<CopyState>("idle")
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -73,6 +75,7 @@ function CopyButton({ value }: { value: string }) {
     }
   }, [])
 
+  /** Copy the generated configuration and expose the result to assistive tech. */
   const handleCopy = async () => {
     if (resetTimer.current) clearTimeout(resetTimer.current)
 
@@ -122,6 +125,7 @@ function CopyButton({ value }: { value: string }) {
   )
 }
 
+/** Advertise the MCP endpoints and help users configure an AI client. */
 export function McpSetupDialog() {
   const [origin, setOrigin] = useState(DEFAULT_ORIGIN)
 
@@ -208,6 +212,25 @@ export function McpSetupDialog() {
               <div className="border-zinc-800 border-t bg-zinc-900/70 px-4 py-3">
                 <CopyButton value={config} />
               </div>
+            </div>
+
+            <div className="space-y-1.5 rounded-md border border-primary/20 bg-primary/5 px-4 py-3 text-muted-foreground text-xs leading-relaxed">
+              <p className="font-semibold text-foreground">Deployment note</p>
+              <p>
+                These URLs require the Cloudflare Pages Functions deployment.
+                Static Docker and GitHub Pages builds do not serve MCP routes.
+              </p>
+              <p>
+                If{" "}
+                <code className="font-mono text-foreground">
+                  MCP_ACCESS_TOKEN
+                </code>{" "}
+                is enabled, add{" "}
+                <code className="font-mono text-foreground">
+                  Authorization: Bearer &lt;token&gt;
+                </code>{" "}
+                in your client.
+              </p>
             </div>
 
             <div className="rounded-md border bg-muted/30 px-4 py-3 text-muted-foreground text-xs leading-relaxed">

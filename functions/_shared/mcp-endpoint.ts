@@ -18,6 +18,7 @@ export type McpPagesFunction = (
 
 const MAX_REQUEST_BYTES = 128 * 1024
 
+/** Return the CORS policy shared by every MCP response. */
 function getCorsHeaders(): Record<string, string> {
   return {
     "Access-Control-Allow-Headers":
@@ -29,6 +30,7 @@ function getCorsHeaders(): Record<string, string> {
   }
 }
 
+/** Read at most the configured request limit before handing the body to MCP. */
 async function limitRequestBody(request: Request): Promise<Request | null> {
   const contentLength = request.headers.get("Content-Length")
   if (
@@ -69,6 +71,7 @@ async function limitRequestBody(request: Request): Promise<Request | null> {
   return new Request(request, { body })
 }
 
+/** Add the shared CORS policy without consuming the response body stream. */
 function withCors(response: Response): Response {
   const headers = new Headers(response.headers)
 
@@ -83,6 +86,7 @@ function withCors(response: Response): Response {
   })
 }
 
+/** Return a JSON error response with the shared CORS policy applied. */
 function errorResponse(
   status: number,
   message: string,
@@ -101,6 +105,7 @@ function errorResponse(
   )
 }
 
+/** Check the optional Pages secret before dispatching an MCP request. */
 function isAuthorized(request: Request, env: McpEnvironment): boolean {
   if (!env.MCP_ACCESS_TOKEN) return true
 
@@ -109,6 +114,7 @@ function isAuthorized(request: Request, env: McpEnvironment): boolean {
   )
 }
 
+/** Create a stateless MCP Pages Function around one server factory. */
 export function createMcpEndpoint(
   createServer: () => McpServer,
 ): McpPagesFunction {

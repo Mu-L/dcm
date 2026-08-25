@@ -5,6 +5,7 @@ import { GradientButton } from "@/components/ui/gradient-button"
 import { Heart } from "lucide-react"
 import { siGithub } from "simple-icons"
 
+/** Render the shared DCM header and its primary discovery actions. */
 export function Header() {
   return (
     <header className="relative z-10 bg-primary/80 bg-stripes py-8 text-primary-foreground shadow-md dark:bg-stripes-dark">
